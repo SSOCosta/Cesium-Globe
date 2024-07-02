@@ -16,6 +16,9 @@
 <body>
     <div id="cesiumContainer"></div>
     <script>
+        // Adicionar o token de acesso
+        Cesium.Ion.defaultAccessToken = 'Cesium Globe';
+
         const viewer = new Cesium.Viewer('cesiumContainer', {
             animation: false,
             timeline: false,
