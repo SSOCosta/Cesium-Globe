@@ -16,7 +16,6 @@
 <body>
     <div id="cesiumContainer"></div>
     <script>
-        // Adicionar o token de acesso
         Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkZTM5YmI1MC0wYjI3LTQxYmYtYjRiZC02ZjRlYTRlZjIxMjAiLCJpZCI6MjI1OTM2LCJpYXQiOjE3MTk5MjYwMzB9.ljnQbabe9QeE2YYlSVYtuw90V0kjSQGa9AhKLBdu2uE';
 
         const viewer = new Cesium.Viewer('cesiumContainer', {
@@ -33,46 +32,25 @@
             sceneModePicker: false
         });
 
-        // Configurar a rotação automática
         viewer.clock.onTick.addEventListener(function() {
             viewer.scene.camera.rotate(Cesium.Cartesian3.UNIT_Z, -0.001);
         });
 
-        // Dados das fábricas da Forvia
-        const forviaFactories = [
-            { name: 'Germany', latitude: 52.52, longitude: 13.405 },
-            { name: 'Spain', latitude: 40.4168, longitude: -3.7038 },
-            { name: 'United Kingdom', latitude: 51.5074, longitude: -0.1278 },
-            { name: 'Italy', latitude: 41.9028, longitude: 12.4964 },
-            { name: 'Poland', latitude: 52.2297, longitude: 21.0122 },
-            { name: 'Czech Republic', latitude: 50.0755, longitude: 14.4378 },
-            { name: 'Romania', latitude: 44.4268, longitude: 26.1025 },
-            { name: 'Portugal', latitude: 38.7223, longitude: -9.1393, color: Cesium.Color.fromCssColorString('#41A4FF') },
-            { name: 'United States', latitude: 38.9072, longitude: -77.0369 },
-            { name: 'Mexico', latitude: 19.4326, longitude: -99.1332 },
-            { name: 'Brazil', latitude: -15.7942, longitude: -47.8822 },
-            { name: 'Argentina', latitude: -34.6037, longitude: -58.3816 },
-            { name: 'China', latitude: 39.9042, longitude: 116.4074 },
-            { name: 'Japan', latitude: 35.6895, longitude: 139.6917 },
-            { name: 'India', latitude: 28.6139, longitude: 77.209 },
-            { name: 'South Korea', latitude: 37.5665, longitude: 126.978 },
-            { name: 'Thailand', latitude: 13.7563, longitude: 100.5018 },
-            { name: 'Morocco', latitude: 34.0209, longitude: -6.8416 },
-            { name: 'Russia', latitude: 55.7558, longitude: 37.6173 },
-            { name: 'Turkey', latitude: 39.9334, longitude: 32.8597 }
-        ];
+        // Carregar e estilizar os países usando GeoJSON
+        const geoJsonData = 'https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson';
+        Cesium.GeoJsonDataSource.load(geoJsonData).then(function(dataSource) {
+            viewer.dataSources.add(dataSource);
 
-        // Adicionar países com fábricas da Forvia
-        forviaFactories.forEach(factory => {
-            viewer.entities.add({
-                name: factory.name,
-                position: Cesium.Cartesian3.fromDegrees(factory.longitude, factory.latitude),
-                ellipse: {
-                    semiMinorAxis: 500000.0,
-                    semiMajorAxis: 500000.0,
-                    material: factory.color || Cesium.Color.fromCssColorString('#0953E8').withAlpha(0.5)
+            const entities = dataSource.entities.values;
+            for (let i = 0; i < entities.length; i++) {
+                const entity = entities[i];
+                if (['DEU', 'ESP', 'GBR', 'ITA', 'POL', 'CZE', 'ROU', 'PRT', 'USA', 'MEX', 'BRA', 'ARG', 'CHN', 'JPN', 'IND', 'KOR', 'THA', 'MAR', 'RUS', 'TUR'].includes(entity.properties.ISO_A3.value)) {
+                    entity.polygon.material = Cesium.Color.fromCssColorString('#0953E8').withAlpha(0.5);
                 }
-            });
+                if (entity.properties.ISO_A3.value === 'PRT') {
+                    entity.polygon.material = Cesium.Color.fromCssColorString('#41A4FF').withAlpha(0.5);
+                }
+            }
         });
     </script>
 </body>
