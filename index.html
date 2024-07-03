@@ -54,7 +54,7 @@
 
                     // Adicionar rótulo aos países com fábricas Forvia
                     entity.label = new Cesium.LabelGraphics({
-                        text: entity.name.getValue(),
+                        text: entity.name ? entity.name.getValue() : '',
                         font: '14pt sans-serif',
                         fillColor: Cesium.Color.BLACK,
                         outlineColor: Cesium.Color.WHITE,
@@ -70,6 +70,11 @@
             }
         }).otherwise(function(error) {
             console.error('Erro ao carregar o GeoJSON:', error);
+        });
+
+        // Parar a rotação contínua do globo
+        viewer.clock.onTick.addEventListener(function() {
+            viewer.clock.shouldAnimate = false;
         });
     </script>
 </body>
