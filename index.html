@@ -8,7 +8,7 @@
     <style>
         #cesiumContainer {
             width: 100%;
-            height: 100%;
+            height: 100vh;
             display: block;
         }
         body {
@@ -18,32 +18,59 @@
     </style>
 </head>
 <body>
-<div id="cesiumContainer"></div>
-<script>
-    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkZTM5YmI1MC0wYjI3LTQxYmYtYjRiZC02ZjRlYTRlZjIxMjAiLCJpZCI6MjI1OTM2LCJpYXQiOjE3MTk5MjYwMzB9.ljnQbabe9QeE2YYlSVYtuw90V0kjSQGa9AhKLBdu2uE';
+    <div id="cesiumContainer"></div>
+    <script>
+        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkZTM5YmI1MC0wYjI3LTQxYmYtYjRiZC02ZjRlYTRlZjIxMjAiLCJpZCI6MjI1OTM2LCJpYXQiOjE3MTk5MjYwMzB9.ljnQbabe9QeE2YYlSVYtuw90V0kjSQGa9AhKLBdu2uE';
 
-    const viewer = new Cesium.Viewer('cesiumContainer', {
-        animation: false,
-        timeline: false,
-        sceneModePicker: false,
-        baseLayerPicker: false,
-        geocoder: false,
-        navigationHelpButton: false,
-        homeButton: false,
-        scene3DOnly: true,
-        imageryProvider: new Cesium.IonImageryProvider({ assetId: 2 }) // Usando uma camada de base clara
-    });
+        const viewer = new Cesium.Viewer('cesiumContainer', {
+            animation: false,
+            timeline: false,
+            homeButton: false,
+            geocoder: false,
+            sceneModePicker: false,
+            baseLayerPicker: false,
+            navigationHelpButton: false,
+            infoBox: false,
+            selectionIndicator: false,
+            navigationInstructionsInitiallyVisible: false,
+            sceneModePicker: false,
+            imageryProvider: new Cesium.IonImageryProvider({ assetId: 4 }) // Usando uma camada de base branca
+        });
 
-    // Carregar o arquivo GeoJSON leve
-    Cesium.GeoJsonDataSource.load('https://raw.githubusercontent.com/SSOCosta/Cesium-Globe/main/map.geojson', {
-        stroke: Cesium.Color.BLACK,
-        fill: Cesium.Color.NAVY.withAlpha(0.5),
-        strokeWidth: 1,
-        markerSymbol: undefined  // Remove os marcadores
-    }).then(function(dataSource) {
-        viewer.dataSources.add(dataSource);
-        viewer.flyTo(dataSource);
-    });
-</script>
+        viewer.clock.onTick.addEventListener(function() {
+            viewer.scene.camera.rotate(Cesium.Cartesian3.UNIT_Z, -0.001);
+        });
+
+        // URL do arquivo GeoJSON
+        const geoJsonData = 'https://raw.githubusercontent.com/SSOCosta/Cesium-Globe/main/map.geojson';
+
+        // Carregar e estilizar os países usando GeoJSON
+        Cesium.GeoJsonDataSource.load(geoJsonData, {
+            stroke: Cesium.Color.BLACK,
+            fill: Cesium.Color.GREY.withAlpha(0.5),
+            strokeWidth: 1,
+            markerSymbol: undefined // Remove os marcadores
+        }).then(function(dataSource) {
+            viewer.dataSources.add(dataSource);
+
+            const entities = dataSource.entities.values;
+            for (let i = 0; i < entities.length; i++) {
+                const entity = entities[i];
+                const isoCode = entity.properties.ISO_A3 ? entity.properties.ISO_A3.getValue() : null;
+
+                // Países com fábricas da Forvia
+                const forviaCountries = ['DEU', 'ESP', 'GBR', 'ITA', 'POL', 'CZE', 'ROU', 'PRT', 'USA', 'MEX', 'BRA', 'ARG', 'CHN', 'JPN', 'IND', 'KOR', 'THA', 'MAR', 'RUS', 'TUR'];
+
+                if (forviaCountries.includes(isoCode)) {
+                    entity.polygon.material = Cesium.Color.fromCssColorString('#0953E8').withAlpha(0.5);
+                }
+                if (isoCode === 'PRT') {
+                    entity.polygon.material = Cesium.Color.fromCssColorString('#41A4FF').withAlpha(0.5);
+                }
+            }
+
+            viewer.flyTo(dataSource);
+        }).catch(error => console.error('Erro ao carregar o arquivo GeoJSON:', error));
+    </script>
 </body>
 </html>
