@@ -21,6 +21,7 @@
 
         // Inicializar o visualizador Cesium
         const viewer = new Cesium.Viewer('cesiumContainer', {
+            imageryProvider: new Cesium.IonImageryProvider({ assetId: 2 }), // Light style
             animation: false,
             timeline: false,
             homeButton: false,
@@ -30,8 +31,7 @@
             navigationHelpButton: false,
             infoBox: false,
             selectionIndicator: false,
-            navigationInstructionsInitiallyVisible: false,
-            sceneModePicker: false
+            navigationInstructionsInitiallyVisible: false
         });
 
         // URL do arquivo GeoJSON no GitHub
@@ -44,7 +44,7 @@
             const entities = dataSource.entities.values;
             for (let i = 0; i < entities.length; i++) {
                 const entity = entities[i];
-                const isoCode = entity.properties.ISO_A3 ? entity.properties.ISO_A3.value : null;
+                const isoCode = entity.properties.ISO_A3 ? entity.properties.ISO_A3.getValue() : null;
 
                 // Países com fábricas da Forvia
                 const forviaCountries = ['DEU', 'ESP', 'GBR', 'ITA', 'POL', 'CZE', 'ROU', 'PRT', 'USA', 'MEX', 'BRA', 'ARG', 'CHN', 'JPN', 'IND', 'KOR', 'THA', 'MAR', 'RUS', 'TUR'];
