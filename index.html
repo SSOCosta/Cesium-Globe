@@ -25,15 +25,14 @@
         const viewer = new Cesium.Viewer('cesiumContainer', {
             animation: false,
             timeline: false,
-            homeButton: false,
+            homeButton: true,
             geocoder: false,
-            sceneModePicker: false,
+            sceneModePicker: true,
             baseLayerPicker: false,
             navigationHelpButton: false,
             infoBox: false,
             selectionIndicator: false,
             navigationInstructionsInitiallyVisible: false,
-            sceneModePicker: false,
             imageryProvider: new Cesium.IonImageryProvider({ assetId: 4 }) // Usando uma camada de base branca
         });
 
@@ -59,7 +58,7 @@
                 const isoCode = entity.properties.ISO_A3 ? entity.properties.ISO_A3.getValue() : null;
 
                 // Países com fábricas da Forvia
-                const forviaCountries = ['DEU', 'ESP', 'GBR', 'ITA', 'POL', 'CZE', 'ROU', 'PRT', 'USA', 'MEX', 'BRA', 'ARG', 'CHN', 'JPN', 'IND', 'KOR', 'THA', 'MAR', 'RUS', 'TUR'];
+                const forviaCountries = ['DEU', 'ESP', 'GBR', 'ITA', 'POL', 'CZE', 'ROU', 'PRT', 'USA', 'MEX', 'BRA', 'ARG', 'CHN', 'JPN', 'IND', 'KOR', 'THA', 'MAR', 'TUR'];
 
                 if (forviaCountries.includes(isoCode)) {
                     entity.polygon.material = Cesium.Color.fromCssColorString('#0953E8').withAlpha(0.5);
