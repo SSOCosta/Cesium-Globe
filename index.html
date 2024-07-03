@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Cesium Globe</title>
+    <title>Interactive Globe</title>
     <script src="https://cesium.com/downloads/cesiumjs/releases/1.85/Build/Cesium/Cesium.js"></script>
     <link href="https://cesium.com/downloads/cesiumjs/releases/1.85/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
     <style>
@@ -16,8 +16,10 @@
 <body>
     <div id="cesiumContainer"></div>
     <script>
+        // Token de acesso CesiumJS
         Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkZTM5YmI1MC0wYjI3LTQxYmYtYjRiZC02ZjRlYTRlZjIxMjAiLCJpZCI6MjI1OTM2LCJpYXQiOjE3MTk5MjYwMzB9.ljnQbabe9QeE2YYlSVYtuw90V0kjSQGa9AhKLBdu2uE';
 
+        // Inicializar o visualizador Cesium
         const viewer = new Cesium.Viewer('cesiumContainer', {
             animation: false,
             timeline: false,
@@ -32,25 +34,35 @@
             sceneModePicker: false
         });
 
-        viewer.clock.onTick.addEventListener(function() {
-            viewer.scene.camera.rotate(Cesium.Cartesian3.UNIT_Z, -0.001);
-        });
+        // URL do arquivo GeoJSON no GitHub
+        const geoJsonUrl = 'https://raw.githubusercontent.com/SSOCosta/Cesium-Globe/main/map.geojson';
 
         // Carregar e estilizar os países usando GeoJSON
-        const geoJsonData = 'https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson';
-        Cesium.GeoJsonDataSource.load(geoJsonData).then(function(dataSource) {
+        Cesium.GeoJsonDataSource.load(geoJsonUrl).then(function(dataSource) {
             viewer.dataSources.add(dataSource);
 
             const entities = dataSource.entities.values;
             for (let i = 0; i < entities.length; i++) {
                 const entity = entities[i];
-                if (['DEU', 'ESP', 'GBR', 'ITA', 'POL', 'CZE', 'ROU', 'PRT', 'USA', 'MEX', 'BRA', 'ARG', 'CHN', 'JPN', 'IND', 'KOR', 'THA', 'MAR', 'RUS', 'TUR'].includes(entity.properties.ISO_A3.value)) {
+                const isoCode = entity.properties.ISO_A3 ? entity.properties.ISO_A3.value : null;
+
+                // Países com fábricas da Forvia
+                const forviaCountries = ['DEU', 'ESP', 'GBR', 'ITA', 'POL', 'CZE', 'ROU', 'PRT', 'USA', 'MEX', 'BRA', 'ARG', 'CHN', 'JPN', 'IND', 'KOR', 'THA', 'MAR', 'RUS', 'TUR'];
+
+                if (forviaCountries.includes(isoCode)) {
                     entity.polygon.material = Cesium.Color.fromCssColorString('#0953E8').withAlpha(0.5);
                 }
-                if (entity.properties.ISO_A3.value === 'PRT') {
+                if (isoCode === 'PRT') {
                     entity.polygon.material = Cesium.Color.fromCssColorString('#41A4FF').withAlpha(0.5);
                 }
             }
+        }).otherwise(function(error) {
+            console.error('Erro ao carregar o GeoJSON:', error);
+        });
+
+        // Configurar rotação automática do globo
+        viewer.clock.onTick.addEventListener(function() {
+            viewer.scene.camera.rotate(Cesium.Cartesian3.UNIT_Z, -0.001);
         });
     </script>
 </body>
